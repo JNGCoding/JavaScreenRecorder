@@ -1,0 +1,4 @@
+org\jngcoding\screenrecorder\Main.class
+org\jngcoding\screenrecorder\lib_files\Capture.class
+org\jngcoding\screenrecorder\lib_files\image_io\ImageWriter.class
+org\jngcoding\screenrecorder\lib_files\video_io\VideoWriter.class

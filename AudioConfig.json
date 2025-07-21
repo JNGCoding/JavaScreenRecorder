@@ -1,0 +1,39 @@
+{
+    "AvailableAudioSourceLines" : [
+        "dummy",
+        "wtf"
+    ],
+
+    "AvailableAudioTargetLines" : [
+        "dummy",
+        "wtf"
+    ],
+
+    "CurrentAudioLines" : {
+        "AbsorbLine" : {
+            "Name" : "CABLE Output (VB-Audio Virtual Cable)",
+            "Type" : "TargetAudioLine",
+
+            "AudioFormat" : {
+                "SampleRate" : 44100,
+                "Bits" : 16,
+                "Channels" : 1,
+                "Signed" : true,
+                "BigEndian" : false
+            }
+        },
+
+        "ReflectLine" : {
+            "Name" : "2- USB PnP Audio Device",
+            "Type" : "SourceAudioLine",
+
+            "AudioFormat" : {
+                "SampleRate" : 44100,
+                "Bits" : 16,
+                "Channels" : 1,
+                "Signed" : true,
+                "BigEndian" : false
+            }
+        }
+    }
+}
