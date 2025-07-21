@@ -21,4 +21,9 @@ public class Capture {
         Robot robot = new Robot();
         return robot.createScreenCapture(new Rectangle(screenSize));
     }
+
+    public static BufferedImage capture(Rectangle area) throws AWTException {
+        Robot robot = new Robot();
+        return robot.createScreenCapture(area);
+    }
 }

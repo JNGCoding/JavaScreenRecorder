@@ -17,15 +17,21 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.github.cliftonlabs</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>4.0.1</version>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec-javase</artifactId>
+            <version>0.2.5</version>
         </dependency>
 
         <dependency>
             <groupId>org.jcodec</groupId>
-            <artifactId>jcodec-javase</artifactId>
+            <artifactId>jcodec</artifactId>
             <version>0.2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.cliftonlabs</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>4.0.1</version>
         </dependency>
 
     </dependencies>

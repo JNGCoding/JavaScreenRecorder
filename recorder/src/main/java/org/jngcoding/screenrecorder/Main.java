@@ -4,6 +4,8 @@ import java.awt.AWTException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.LockSupport;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
@@ -20,7 +22,7 @@ import org.jngcoding.screenrecorder.lib_files.wav_writer.WaveFileConfig;
 import com.github.cliftonlabs.json_simple.JsonException;
 
 public class Main {
-    // Path definitions
+    // Constants
     private static final String CWD = System.getProperty("user.dir");
     private static final String AUDIO_CONFIG_PATH = CWD + "\\AudioConfig.json";
     private static final String VIDEO_CONFIG_PATH = CWD + "\\VideoConfig.json";
@@ -30,26 +32,30 @@ public class Main {
     private static final VideoWriter video_writer = new VideoWriter();
     private static AudioLooper audio_looper = null;
 
-    // Loading the configs
+    // Configs
     private static AudioConfig audio_config;
     private static VideoConfig video_config;
+
+    // Thread flags and buffer
+    private static boolean RecordFlag = false;
+    private static final LinkedBlockingQueue<BufferedImage> imageBuffer = new LinkedBlockingQueue<>(100);
 
     static {
         try {
             audio_config = new AudioConfig(AUDIO_CONFIG_PATH);
             video_config = new VideoConfig(VIDEO_CONFIG_PATH);
         } catch (JsonException e) {
-            System.out.println("Error message : " + e.getMessage());
+            System.out.println("Error loading configs: " + e.getMessage());
         }
     }
-
-    // Thread Flags
-    private static boolean RecordFlag = false;
 
     private static void PrintCrash(Exception exception) {
         System.out.println("Error Name : " + exception.getClass().getName());
         System.out.println("Error Message : " + exception.getMessage());
-        System.out.println("Error Cause : " + exception.getCause().toString());
+        Throwable cause = exception.getCause();
+        if (cause != null) {
+            System.out.println("Error Cause : " + cause);
+        }
         System.out.println("Stack Trace :\n" + Arrays.toString(exception.getStackTrace()));
     }
 
@@ -71,30 +77,44 @@ public class Main {
                 try {
                     video_writer.check_and_create(); 
                     video_writer.start_encoder(video_config.getFPS());
-                    
+
                     if (video_config.getSystemAudio() && audio_looper != null) {
-                        try {
-                            audio_looper.start(path + ".wav"); 
-                        } catch (LineUnavailableException | IOException exception) {
-                            reportCrash(exception);
-                        }
+                        audio_looper.start(path + ".wav"); 
                     }
 
-                    Thread Rec = new Thread(() -> {
+                    Thread captureThread = new Thread(() -> {
                         while (RecordFlag) {
                             try {
-                                BufferedImage image = Capture.capture();
-                                long SystemTime = System.currentTimeMillis();
-                                while (System.currentTimeMillis() - SystemTime < video_config.getFrameTime()) {
-                                    video_writer.encode_image(image);
+                                long captureStart = System.nanoTime();
+                                BufferedImage image = Capture.capture(video_config.getCaptureArea());
+                                imageBuffer.put(image); // waits if buffer is full
+                                long sleepTime = (video_config.getFrameTime() * 1_000_000) - (System.nanoTime() - captureStart);
+                                if (sleepTime > 0) {
+                                    LockSupport.parkNanos(sleepTime);
                                 }
-                            } catch (AWTException | IOException exception) {
-                                reportCrash(exception);
+                            } catch (AWTException | InterruptedException ex) {
+                                reportCrash(ex);
                             }
                         }
-                    }); Rec.setDaemon(true); Rec.start();
-                } catch (IOException io_exception) {
-                    reportCrash(io_exception);
+                    });
+                    captureThread.setDaemon(true);
+                    captureThread.start();
+
+                    Thread encoderThread = new Thread(() -> {
+                        while (RecordFlag || !imageBuffer.isEmpty()) {
+                            try {
+                                BufferedImage image = imageBuffer.take(); // waits if buffer is empty
+                                video_writer.encode_image(image);
+                            } catch (IOException | InterruptedException ex) {
+                                reportCrash(ex);
+                            }
+                        }
+                    });
+                    encoderThread.setDaemon(true);
+                    encoderThread.start();
+
+                } catch (IOException | LineUnavailableException exception) {
+                    reportCrash(exception);
                 }
             }
         });
@@ -104,13 +124,9 @@ public class Main {
             if (e.getSource() == program.components.get("StopRecording")) {
                 RecordFlag = false;
                 try {
-                    Thread.sleep(100); // Just a safety step (to wait for the RecThread to close on its own.)
+                    Thread.sleep(100); // wait for threads to settle
                     if (video_config.getSystemAudio() && audio_looper != null) {
-                        try {
-                            audio_looper.stop();
-                        } catch (IOException | InterruptedException exception) {
-                            reportCrash(exception);
-                        }
+                        audio_looper.stop();
                     }
                     video_writer.stop_encoder();
                 } catch (IOException | InterruptedException exception) {

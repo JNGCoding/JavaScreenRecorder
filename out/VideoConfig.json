@@ -1,6 +1,6 @@
 {
     "FPS" : 30,
-    "SystemAudio" : false,
+    "SystemAudio" : true,
     "CaptureArea" : {
         "FullScreen" : false,
         "X" : 450,

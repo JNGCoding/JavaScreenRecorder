@@ -14,25 +14,17 @@ public class ControlProgram {
     public ControlProgram(String title, int width, int height) {
         screen = new GUIWindow(title, width, height);
         panel = new GUIPanel();
-
         autoload();
     }
 
     public ControlProgram(String title, int width, int height, int x, int y) {
         screen = new GUIWindow(title, width, height, x, y);
         panel = new GUIPanel();
-
         autoload();
     }
 
     private void autoload() {
         screen.add(panel);
-
-        /*
-         * Button1 (Start Recording) - Starts a new thread that records every thing present on the screen.
-         * Button2 (Stop Recording) - Stops the recording thread and saves the file.
-         * FileChooser - Loads the file
-        */
 
         RoundButton start_recording = new RoundButton("Start Recording");
         start_recording.setBounds(50, 0, 200, 100);
@@ -47,12 +39,12 @@ public class ControlProgram {
         components.put("StopRecording", stop_recording);
         components.put("FileChooser", chooser);
 
-        for (int i = 0; i < components.size(); i++) {
-            panel.add((Component) components.values().toArray()[i]);
+        for (Component comp : components.values()) {
+            panel.add(comp);
         }
     }
 
     public void setVisible(boolean c) {
-        screen.setVisible(true);
+        screen.setVisible(c);
     }
 }
