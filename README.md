@@ -45,7 +45,7 @@ mvn package
 ### Run
 
 ```sh
-java -jar target/recorder-1.jar
+java -jar out/ScreenRecorderJava.jar
 ```
 
 ### Configuration
