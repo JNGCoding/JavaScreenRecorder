@@ -1,7 +1,4 @@
 # ScreenRecorderJava
-
-**Still in Development**
-
 ScreenRecorderJava is a desktop application for Windows that allows you to record your screen and system audio. It features a simple GUI for starting and stopping recordings, and saves output as `.mp4` (video) and `.wav` (audio) files.
 
 ## Features
@@ -51,7 +48,7 @@ java -jar out/ScreenRecorderJava.jar
 ### Configuration
 
 - **AudioConfig.json**: Configure available audio lines and formats.
-- **VideoConfig.json**: Set video FPS and audio options.
+- **VideoConfig.json**: Set video FPS, audio options and Capture Area.
 
 ## Usage
 
@@ -65,6 +62,4 @@ java -jar out/ScreenRecorderJava.jar
 - [jcodec](https://github.com/jcodec/jcodec)
 
 ## Notes
-
-- This project is **Still in Development**. Features and stability may change.
 - For best results, ensure your audio devices are properly configured.
