@@ -2,8 +2,6 @@ Not being able to execute the jar file ?
 1) Update your java files.
 	- Install the latest Version of java in your computer.
 
-; There is no flexibility in the code, so the recording will always be in the Current Working Directory as output.mp4.
-
 Doesn't understand what the Audio config is for ?
 1) Audio Config is made to identify your Virtual Audio Drivers from which your System Audio will be looped in order to be saved.
 2) Absorb Line stores the information about your Virtual Audio OUTPUT.
